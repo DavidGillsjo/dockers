@@ -1,9 +1,20 @@
-FROM datmo/keras-tensorflow:gpu
+FROM tensorflow/tensorflow:latest-gpu-py3
 
-# Get utils
-RUN apt-get update && apt-get install -y git wget python-tk && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Install some dependencies
+RUN apt-get update && apt-get install -y \
+		wget\
+    git\
+    python3-tk\
+		&& \
+	apt-get clean && \
+	apt-get autoremove && \
+	rm -rf /var/lib/apt/lists/*
+
+# Install Keras
+RUN pip3 install h5py
+RUN pip3 --no-cache-dir install git+git://github.com/fchollet/keras.git
+
+WORKDIR "/workspace"
 
 #Download code
 RUN git clone -b folder_support https://github.com/DavidGillsjo/PSPNet-Keras-tensorflow.git pspnet
@@ -15,5 +26,4 @@ RUN wget -nv "https://www.dropbox.com/s/xkjmghsbn6sfj9k/pspnet101_voc2012.npy?dl
 
 VOLUME data
 
-RUN chmod +x "/home/run_jupyter.sh"
-CMD ["bash", "-c", "/home/run_jupyter.sh"]
+CMD ["bash", "-c", "/run_jupyter.sh --allow-root"]
