@@ -1,13 +1,12 @@
 FROM datmo/keras-tensorflow:gpu
 
 # Get utils
-RUN apt-get update && apt-get install -y git wget && \
+RUN apt-get update && apt-get install -y git wget python-tk && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 #Download code
-RUN git clone https://github.com/DavidGillsjo/PSPNet-Keras-tensorflow.git pspnet &&\
-    git checkout folder_support
+RUN git clone -b folder_support https://github.com/DavidGillsjo/PSPNet-Keras-tensorflow.git pspnet
 
 #Model weights
 RUN wget -nv "https://www.dropbox.com/s/ms8afun494dlh1t/pspnet50_ade20k.npy?dl=0" -O "pspnet/weights/npy/pspnet50_ade20k.npy"
