@@ -26,4 +26,4 @@ RUN wget -nv "https://www.dropbox.com/s/xkjmghsbn6sfj9k/pspnet101_voc2012.npy?dl
 
 VOLUME data
 
-CMD ["bash", "-c", "/run_jupyter.sh --allow-root"]
+CMD ["/run_jupyter.sh", "--allow-root"]
