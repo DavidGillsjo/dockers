@@ -4,4 +4,4 @@ docker build\
   --build-arg gid=$(id -g)\
   --build-arg uid=$(id -u)\
   --build-arg user="$USER"\
-  .
+  "$@" .
