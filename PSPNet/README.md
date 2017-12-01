@@ -19,7 +19,7 @@ Simply run `./build.sh`.
 This will setup a cloned user in the image.
 If you need to use `sudo` to run docker, run this to clone your user `<myusername>`:
 ```
-sudo USER=<myusername> ./build.sh
+sudo DUSER=<myusername> ./build.sh
 ```
 
 ## Run locally
@@ -29,16 +29,16 @@ After building, run the image with:
 
 There are two optional arguments here:
 - `DATA=<datadir>` allows you to mount a data directory which you access from within the container.
-- `USER=<myuser>` allows you to run the container as another user than the user executing the script
+- `DUSER=<myuser>` allows you to run the container as another user than the user executing the script
 
 For example, mounting the data directory `/home/$USER/data` on the host and running as root:
 ```
-DATA=/home/$USER/data USER=root ./run_local.sh bash
+DATA=/home/$USER/data DUSER=root ./run_local.sh bash
 ```
 
 Or if you need to use `sudo` to run docker but want to run the container as your user `<myusername>`:
 ```
-sudo USER=<myusername> ./run_local.sh bash
+sudo DUSER=<myusername> ./run_local.sh bash
 ```
 
 ## Pull from dockerhub and run
