@@ -4,8 +4,8 @@
 if [ $(id -g $USER) == 0 ] ; then
   BUILD_ARGS=""
 else
-  BUILD_ARGS="--build-arg gid=$(id -g)\
-              --build-arg uid=$(id -u)\
+  BUILD_ARGS="--build-arg gid=$(id -g $USER)\
+              --build-arg uid=$(id -u $USER)\
               --build-arg user=$USER"
 fi
 
