@@ -38,7 +38,7 @@ DATA=/home/$USER/data USER=root ./run_local.sh bash
 
 Or if you need to use `sudo` to run docker but want to run the container as your user `<myusername>`:
 ```
-USER=<myusername> ./run_local.sh bash
+sudo USER=<myusername> ./run_local.sh bash
 ```
 
 ## Pull from dockerhub and run
