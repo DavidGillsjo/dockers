@@ -14,9 +14,13 @@ The image is built to run on a GPU and requires [docker](https://docs.docker.com
 and [nvidia-docker](https://github.com/NVIDIA/nvidia-docker).
 
 ## Build
-Simple run `./build.sh`.
+Simply run `./build.sh`.
 
 This will setup a cloned user in the image.
+If you need to use `sudo` to run docker, run this to clone your user `<myusername>`:
+```
+sudo USER=<myusername> ./build.sh
+```
 
 ## Run locally
 After building, run the image with:
