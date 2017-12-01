@@ -9,6 +9,10 @@ https://github.com/Vladkryvoruchko/PSPNet-Keras-tensorflow.
 It can be pulled from dockerhub or build locally.
 Building locally enables you to clone your host machine user properly.
 
+## Dependencies
+The image is built to run on a GPU and requires [docker](https://docs.docker.com/get-started/)
+and [nvidia-docker](https://github.com/NVIDIA/nvidia-docker).
+
 ## Build
 Simple run `./build.sh`.
 
