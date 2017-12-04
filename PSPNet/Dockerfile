@@ -43,5 +43,7 @@ RUN wget -nv "https://www.dropbox.com/s/b21j6hi6qql90l0/pspnet101_cityscapes.npy
 RUN wget -nv "https://www.dropbox.com/s/xkjmghsbn6sfj9k/pspnet101_voc2012.npy?dl=0" -O "pspnet/weights/npy/pspnet101_voc2012.npy"
 
 VOLUME data
+VOLUME host_home
+
 
 CMD ["/run_jupyter.sh", "--ip=0.0.0.0"]
