@@ -29,6 +29,7 @@ After building, run the image with:
 
 There are two optional arguments here:
 - `DATA=<datadir>` allows you to mount a data directory which you access from within the container.
+- `DHOME=<homedir>` allows you to mount a home directory which you access from within the container, defaults to `$HOME`.
 - `DUSER=<myuser>` allows you to run the container as another user than the user executing the script
 
 For example, mounting the data directory `/home/$USER/data` on the host and running as root:
