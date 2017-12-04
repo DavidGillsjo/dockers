@@ -10,8 +10,7 @@ else
               --build-arg uid=$(id -u $MY_USER)\
               --build-arg user=$MY_USER"
 fi
-echo $BUILD_ARGS
-exit
+
 docker build ${BUILD_ARGS}\
   -t pspnet\
    "$@" .
