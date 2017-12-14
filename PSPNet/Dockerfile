@@ -33,7 +33,7 @@ RUN chown "${user}" "/workspace"
 USER "${user}"
 
 #Download code
-RUN git clone -b folder_support https://github.com/DavidGillsjo/PSPNet-Keras-tensorflow.git pspnet
+RUN git clone -b devel https://github.com/DavidGillsjo/PSPNet-Keras-tensorflow.git pspnet
 #All users can run the code (in case the --user argument is used at runtime to have access to data.)
 RUN chmod -R o+rw pspnet
 
