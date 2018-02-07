@@ -1,7 +1,7 @@
 FROM tensorflow/tensorflow:latest-gpu-py3
 
 # Arguments
-ARG user=pspdocker
+ARG user=fcrndocker
 ARG uid=1000
 ARG gid=1000
 
@@ -31,7 +31,7 @@ USER "${user}"
 #Download code
 RUN git clone -b devel https://github.com/DavidGillsjo/FCRN-DepthPrediction.git fcrn
 #All users can run the code (in case the --user argument is used at runtime to have access to data.)
-RUN chmod -R o+rw pspnet
+RUN chmod -R o+rw fcrn
 
 #Model weights
 RUN wget -nv "http://campar.in.tum.de/files/rupprecht/depthpred/NYU_FCRN-checkpoint.zip" -O "fcrn/tensorflow/m.zip"
@@ -40,5 +40,7 @@ RUN unzip "fcrn/tensorflow/m.zip" "fcrn/tensorflow/"
 VOLUME data
 VOLUME host_home
 
+# No need for interactive backend in matplotlib
+ENV MPLBACKEND "Agg"
 
 CMD ["/run_jupyter.sh", "--ip=0.0.0.0"]
