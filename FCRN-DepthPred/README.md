@@ -45,3 +45,11 @@ sudo DUSER=<myusername> ./run_local.sh bash
 ## Pull from dockerhub and run
 Fastest way to get started, simply run `./run_dockerhub.sh`.
 Same options as above.
+
+## Run the net
+Example:
+```
+cd fcrn/tensorflow
+python predict.py NYU_FCRN.ckpt "<datapath>/*.JPG" -o <output_folder> -f mat,img
+```
+See `python predict.py --help` for more info.

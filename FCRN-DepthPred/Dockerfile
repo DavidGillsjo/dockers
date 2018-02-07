@@ -34,8 +34,8 @@ RUN git clone -b devel https://github.com/DavidGillsjo/FCRN-DepthPrediction.git 
 RUN chmod -R o+rw pspnet
 
 #Model weights
-RUN wget -nv "http://campar.in.tum.de/files/rupprecht/depthpred/NYU_FCRN-checkpoint.zip" -O "fcrn/models/m.zip"
-RUN unzip "fcrn/models/m.zip" "fcrn/models/"
+RUN wget -nv "http://campar.in.tum.de/files/rupprecht/depthpred/NYU_FCRN-checkpoint.zip" -O "fcrn/tensorflow/m.zip"
+RUN unzip "fcrn/tensorflow/m.zip" "fcrn/tensorflow/"
 
 VOLUME data
 VOLUME host_home
