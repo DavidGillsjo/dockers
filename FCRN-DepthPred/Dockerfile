@@ -35,7 +35,7 @@ RUN chmod -R o+rw fcrn
 
 #Model weights
 RUN wget -nv "http://campar.in.tum.de/files/rupprecht/depthpred/NYU_FCRN-checkpoint.zip" -O "fcrn/tensorflow/m.zip"
-RUN unzip "fcrn/tensorflow/m.zip" "fcrn/tensorflow/"
+RUN unzip "fcrn/tensorflow/m.zip" -d "fcrn/tensorflow/"
 
 VOLUME data
 VOLUME host_home
