@@ -27,7 +27,7 @@ After building, run the image with:
 - `./run_local.sh` for jupyter notebook
 - `./run_local.sh bash` for interactive bash prompt
 
-There are two optional arguments here:
+There are some optional arguments here:
 - `DATA=<datadir>` allows you to mount a data directory which you access from within the container.
 - `DHOME=<homedir>` allows you to mount a home directory which you access from within the container, defaults to `$HOME`.
 - `DUSER=<myuser>` allows you to run the container as another user than the user executing the script
