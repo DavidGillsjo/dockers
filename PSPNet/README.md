@@ -24,7 +24,7 @@ sudo DUSER=<myusername> ./build.sh
 
 ## Run locally
 After building, run the image with:
-- `./run_local.sh` for jupyter notebook
+- `./run_local.sh` for pspnet.py
 - `./run_local.sh bash` for interactive bash prompt
 
 There are some optional arguments here:
@@ -41,6 +41,17 @@ Or if you need to use `sudo` to run docker but want to run the container as your
 ```
 sudo DUSER=<myusername> ./run_local.sh bash
 ```
+
+Batch process folder of jpg images mounted in DATA and skip rescaling (for increased speed):
+```
+sudo DATA=<imgdir> DUSER=<myusername> ./run_local.sh -g "/ws/data/*.jpg" -o /ws/data/<outdir> -m pspnet50_ade20k -ns
+```
+
+Start jupyter:
+```
+sudo DUSER=<myusername> ./run_local.sh jupyter
+```
+
 
 ## Pull from dockerhub and run
 Fastest way to get started, simply run `./run_dockerhub.sh`.

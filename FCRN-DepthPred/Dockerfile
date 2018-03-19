@@ -24,10 +24,12 @@ RUN export uid="${uid}" gid="${gid}" && \
     passwd -d "${user}" && \
     usermod -aG sudo "${user}"
 
-WORKDIR "/workspace"
-RUN chown "${user}" "/workspace"
-USER "${user}"
+WORKDIR "/ws"
+RUN chown "${uid}:${gid}" "/ws"
+USER "${uid}"
 
+# Changes when we update the repo, forces docker to clone the code and not use cache.
+ADD https://api.github.com/repos/DavidGillsjo/FCRN-DepthPrediction/git/refs/heads/devel version.json
 #Download code
 RUN git clone -b devel https://github.com/DavidGillsjo/FCRN-DepthPrediction.git fcrn
 #All users can run the code (in case the --user argument is used at runtime to have access to data.)
@@ -43,4 +45,6 @@ VOLUME host_home
 # No need for interactive backend in matplotlib
 ENV MPLBACKEND "Agg"
 
-CMD ["/run_jupyter.sh", "--ip=0.0.0.0"]
+# Setup entrypoint
+COPY docker-entrypoint.sh /ws/docker-entrypoint.sh
+ENTRYPOINT ["/ws/docker-entrypoint.sh"]

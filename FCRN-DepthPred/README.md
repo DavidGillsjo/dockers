@@ -24,7 +24,7 @@ sudo DUSER=<myusername> ./build.sh
 
 ## Run locally
 After building, run the image with:
-- `./run_local.sh` for jupyter notebook
+- `./run_local.sh` for pspnet.py
 - `./run_local.sh bash` for interactive bash prompt
 
 There are some optional arguments here:
@@ -42,14 +42,16 @@ Or if you need to use `sudo` to run docker but want to run the container as your
 sudo DUSER=<myusername> ./run_local.sh bash
 ```
 
+Batch process folder of jpg images mounted in DATA:
+```
+sudo DATA=<imgdir> DUSER=<myusername> ./run_local.sh NYU_FCRN.ckpt "/ws/data/*.JPG" -o /ws/data/<output_folder> -f mat,img
+```
+
+Start jupyter:
+```
+sudo DUSER=<myusername> ./run_local.sh jupyter
+```
+
 ## Pull from dockerhub and run
 Fastest way to get started, simply run `./run_dockerhub.sh`.
 Same options as above.
-
-## Run the net
-Example:
-```
-cd fcrn/tensorflow
-python predict.py NYU_FCRN.ckpt "<datapath>/*.JPG" -o <output_folder> -f mat,img
-```
-See `python predict.py --help` for more info.

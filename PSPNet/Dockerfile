@@ -28,10 +28,12 @@ RUN export uid="${uid}" gid="${gid}" && \
     passwd -d "${user}" && \
     usermod -aG sudo "${user}"
 
-WORKDIR "/workspace"
-RUN chown "${user}" "/workspace"
-USER "${user}"
+WORKDIR "/ws"
+RUN chown "${uid}:${gid}" "/ws"
+USER "${uid}"
 
+# Changes when we update the repo, forces docker to clone the code and not use cache.
+ADD https://api.github.com/repos/DavidGillsjo/PSPNet-Keras-tensorflow/git/refs/heads/devel version.json
 #Download code
 RUN git clone -b devel https://github.com/DavidGillsjo/PSPNet-Keras-tensorflow.git pspnet
 #All users can run the code (in case the --user argument is used at runtime to have access to data.)
@@ -45,5 +47,6 @@ RUN wget -nv "https://www.dropbox.com/s/xkjmghsbn6sfj9k/pspnet101_voc2012.npy?dl
 VOLUME data
 VOLUME host_home
 
-
-CMD ["/run_jupyter.sh", "--ip=0.0.0.0"]
+# Setup entrypoint
+COPY docker-entrypoint.sh /ws/docker-entrypoint.sh
+ENTRYPOINT ["/ws/docker-entrypoint.sh"]
