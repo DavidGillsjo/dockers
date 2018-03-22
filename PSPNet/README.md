@@ -21,6 +21,7 @@ If you need to use `sudo` to run docker, run this to clone your user `<myusernam
 ```
 sudo DUSER=<myusername> ./build.sh
 ```
+If you want to name the image differently from default, use the `IMAGE` argument.
 
 ## Run locally
 After building, run the image with:
@@ -31,6 +32,7 @@ There are some optional arguments here:
 - `DATA=<datadir>` allows you to mount a data directory which you access from within the container as `/data`.
 - `DHOME=<homedir>` allows you to mount a home directory which you access from within the container as `/host_home`, defaults to `$HOME`.
 - `DUSER=<myuser>` allows you to run the container as another user than the user executing the script
+- `IMAGE=<image name>` in case you named your image differently from default name.
 
 For example, mounting the data directory `/home/$USER/data` on the host and running as root:
 ```
