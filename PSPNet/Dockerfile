@@ -40,9 +40,12 @@ RUN git clone -b devel https://github.com/DavidGillsjo/PSPNet-Keras-tensorflow.g
 RUN chmod -R o+rw pspnet
 
 #Model weights
-RUN wget -nv "https://www.dropbox.com/s/ms8afun494dlh1t/pspnet50_ade20k.npy?dl=0" -O "pspnet/weights/npy/pspnet50_ade20k.npy"
-RUN wget -nv "https://www.dropbox.com/s/b21j6hi6qql90l0/pspnet101_cityscapes.npy?dl=0" -O "pspnet/weights/npy/pspnet101_cityscapes.npy"
-RUN wget -nv "https://www.dropbox.com/s/xkjmghsbn6sfj9k/pspnet101_voc2012.npy?dl=0" -O "pspnet/weights/npy/pspnet101_voc2012.npy"
+RUN wget -nv "https://www.dropbox.com/s/0uxn14y26jcui4v/pspnet50_ade20k.h5?dl=1" -O "pspnet/weights/keras/pspnet50_ade20k.h5"
+RUN wget -nv "https://www.dropbox.com/s/v41lvku2lx7lh6m/pspnet50_ade20k.json?dl=1" -O "pspnet/weights/keras/pspnet50_ade20k.json"
+RUN wget -nv "https://www.dropbox.com/s/c17g94n946tpalb/pspnet101_cityscapes.h5?dl=1" -O "pspnet/weights/keras/pspnet101_cityscapes.h5"
+RUN wget -nv "https://www.dropbox.com/s/fswowe8e3o14tdm/pspnet101_cityscapes.json?dl=1" -O "pspnet/weights/keras/pspnet101_cityscapes.json"
+RUN wget -nv "https://www.dropbox.com/s/uvqj2cjo4b9c5wg/pspnet101_voc2012.h5?dl=1" -O "pspnet/weights/keras/pspnet101_voc2012.h5"
+RUN wget -nv "https://www.dropbox.com/s/rr5taqu19f5fuzy/pspnet101_voc2012.json?dl=1" -O "pspnet/weights/keras/pspnet101_voc2012.json"
 
 VOLUME data
 VOLUME host_home
