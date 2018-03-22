@@ -21,10 +21,10 @@ if [ -z $DHOME ] ; then
   if [ $(id -g $USER) == 0 ] ; then
     HOME_OPT=""
   else
-    HOME_OPT="-v ${HOME}:/ws/host_home:rw"
+    HOME_OPT="-v ${HOME}:/host_home:rw"
   fi
 else
-  HOME_OPT="-v ${DHOME}:/ws/host_home:rw"
+  HOME_OPT="-v ${DHOME}:/host_home:rw"
 fi
 
 #Container name specified?
@@ -37,7 +37,7 @@ echo
 #Run!
 nvidia-docker run --rm -it \
         ${NAME_OPT}\
-        -v "${DATA-/tmp/data}:/ws/data:rw"\
+        -v "${DATA-/tmp/data}:/data:rw"\
         -p "8000-9000:8888"\
         ${USER_OPT}\
         ${HOME_OPT}\
