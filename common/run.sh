@@ -1,14 +1,27 @@
 #!/bin/bash
 #Usage: [ENV_OPTS] ./run [CMD] [ARGS]
 
+#X Display stuff
+XSOCK=/tmp/.X11-unix
+XAUTH=/tmp/.docker.xauth
+touch $XAUTH
+xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+
 if [ -z $IMAGE ] ; then
   echo "Parameter IMAGE must be specified to choose the image"
 fi
 
 if [ "${USE_NVIDIA}" == 1 ] ; then
   DOCKER_CALL="nvidia-docker"
+  XDISPLAY_OPT=""
 else
   DOCKER_CALL="docker"
+  XDISPLAY_OPT="--volume=/dev/dri:/dev/dri:rw \
+                --volume=$XAUTH:$XAUTH:rw \
+                --env=XAUTHORITY=${XAUTH} \
+                --volume=$XSOCK:$XSOCK:rw \
+                --env=DISPLAY \
+                --env='QT_X11_NO_MITSHM=1'"
 fi
 
 # Use $USER unless run with sudo
@@ -47,4 +60,5 @@ ${DOCKER_CALL} run --rm -it \
         -p "8000-9000:8888"\
         ${USER_OPT}\
         ${HOME_OPT}\
+        ${XDISPLAY_OPT}\
         "${IMAGE}" "$@"

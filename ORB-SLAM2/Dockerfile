@@ -82,7 +82,7 @@ RUN export uid="${uid}" gid="${gid}" && \
 # Folder ownership for user
 RUN chown -R "${uid}:${gid}" "/ws"
 # Enable access to graphics HW
-RUN adduser "${uid}" video
+RUN adduser "${user}" video
 # Switch to user
 USER "${uid}"
 
