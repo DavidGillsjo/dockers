@@ -1,3 +1,3 @@
 #!/bin/bash
 #Usage: [ENV_OPTS] ./run_local [CMD] [ARGS]
-IMAGE=${IMAGE-pspnet} ./../common/run.sh "$@"
+USE_NVIDIA=1 IMAGE=${IMAGE-pspnet} ./../common/run.sh "$@"

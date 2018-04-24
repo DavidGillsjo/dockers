@@ -1,3 +1,3 @@
 #!/bin/bash
 #Usage: [ENV_OPTS] ./run_dockerhub [CMD] [ARGS]
-IMAGE="davidgillsjo/fcrn" ./../common/run.sh "$@"
+USE_NVIDIA=1 IMAGE="davidgillsjo/fcrn" ./../common/run.sh "$@"

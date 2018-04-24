@@ -5,6 +5,12 @@ if [ -z $IMAGE ] ; then
   echo "Parameter IMAGE must be specified to choose the image"
 fi
 
+if [ "${USE_NVIDIA}" == 1 ] ; then
+  DOCKER_CALL="nvidia-docker"
+else
+  DOCKER_CALL="docker"
+fi
+
 # Use $USER unless run with sudo
 if [ -z $DUSER ] ; then
   if [ $(id -g $USER) == 0 ] ; then
@@ -35,7 +41,7 @@ else
 fi
 echo
 #Run!
-nvidia-docker run --rm -it \
+${DOCKER_CALL} run --rm -it \
         ${NAME_OPT}\
         -v "${DATA-/tmp/data}:/data:rw"\
         -p "8000-9000:8888"\

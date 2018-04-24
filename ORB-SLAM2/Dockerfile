@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y \
   libswscale-dev \
   python-dev \
   python-numpy \
-  unzip \
+  unzip &&\
 	apt-get clean && \
 	apt-get autoremove && \
 	rm -rf /var/lib/apt/lists/*
@@ -62,6 +62,7 @@ RUN git clone https://github.com/stevenlovegrove/Pangolin.git \
   && make
 
 # build ORB-SLAM2
+ADD https://api.github.com/repos/raulmur/ORB_SLAM2/git/refs/heads
 RUN git clone https://github.com/raulmur/ORB_SLAM2.git ORB_SLAM2 \
   && cd ORB_SLAM2 \
   && chmod +x build.sh
