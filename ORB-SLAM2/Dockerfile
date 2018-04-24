@@ -14,10 +14,12 @@ ENV OPENCV_DOWNLOAD_URL https://github.com/opencv/opencv/archive/$OPENCV_VERSION
 ENV OpenCV_DIR opencv-$OPENCV_VERSION
 ENV EIGEN_VERSION 3.3.2
 ENV EIGEN_DOWNLOAD_URL http://bitbucket.org/eigen/eigen/get/$EIGEN_VERSION.tar.gz
+ENV ORBSLAM_BRANCH devel
+ENV ORBSLAM_ORIGIN davidgillsjo
 
 RUN apt-get update && apt-get install -y \
-	sudo \
-	build-essential \
+  sudo \
+  build-essential \
   cmake \
   curl \
   gcc \
@@ -30,10 +32,11 @@ RUN apt-get update && apt-get install -y \
   libswscale-dev \
   python-dev \
   python-numpy \
-  unzip &&\
-	apt-get clean && \
-	apt-get autoremove && \
-	rm -rf /var/lib/apt/lists/*
+  unzip && \
+  apt-get clean && \
+  apt-get autoremove && \
+  rm -rf /var/lib/apt/lists/*
+
 
 # install OpenCV
 RUN curl -fsSL "$OPENCV_DOWNLOAD_URL" -o opencv.zip \
@@ -59,23 +62,28 @@ RUN git clone https://github.com/stevenlovegrove/Pangolin.git \
   && mkdir build \
   && cd build \
   && cmake .. \
-  && make
+  && cmake --build .
 
+WORKDIR "/ws"
 # build ORB-SLAM2
-ADD https://api.github.com/repos/raulmur/ORB_SLAM2/git/refs/heads
-RUN git clone https://github.com/raulmur/ORB_SLAM2.git ORB_SLAM2 \
-  && cd ORB_SLAM2 \
-  && chmod +x build.sh
+ADD https://api.github.com/repos/"$ORBSLAM_ORIGIN"/ORB_SLAM2/git/refs/heads/"$ORBSLAM_BRANCH" /orb_version.json
+RUN git clone -b "$ORBSLAM_BRANCH" https://github.com/"$ORBSLAM_ORIGIN"/ORB_SLAM2.git ORB_SLAM2
+RUN cd ORB_SLAM2 \
+    && chmod +x build.sh \
+    && ./build.sh
 
-# Setup user
+# Add user
 RUN export uid="${uid}" gid="${gid}" && \
     groupadd -g "${gid}" "${user}" && \
     useradd -m -u "${uid}" -g "${user}" -s /bin/bash "${user}" && \
     passwd -d "${user}" && \
     usermod -aG sudo "${user}"
 
-WORKDIR "/ws"
-RUN chown "${uid}:${gid}" "/ws"
+# Folder ownership for user
+RUN chown -R "${uid}:${gid}" "/ws"
+# Enable access to graphics HW
+RUN adduser "${uid}" video
+# Switch to user
 USER "${uid}"
 
 VOLUME data
