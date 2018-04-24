@@ -7,7 +7,7 @@ fi
 
 MY_USER=${DUSER-$USER}
 
-if [ -z $(id -g $MY_USER)]
+if [ -z $(id -g $MY_USER) ]
 then #Check if user exists, if not use default uid, gid.
   BUILD_ARGS="--build-arg user=$MY_USER"
 elif [ $(id -g $MY_USER) == 0 ]
