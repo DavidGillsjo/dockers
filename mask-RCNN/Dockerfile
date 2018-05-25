@@ -1,10 +1,10 @@
-FROM nvidia/cuda:9.2-cudnn7-runtime
+FROM nvidia/cuda:9.2-cudnn7-devel
 
 # Arguments
 ARG user=pytorch
 ARG uid=1000
 ARG gid=1000
-ARG gpu_arch=sm_52
+ARG gpu_arch=sm_61
 
 # Install some dependencies
 RUN apt-get update && apt-get install -y \
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 	apt-get autoremove && \
 	rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install torch torchvision numpy scipy matplotlib scikit-image h5py
+RUN pip3 install torch torchvision numpy scipy matplotlib scikit-image h5py cffi
 
 WORKDIR "/ws"
 # Changes when we update the repo, forces docker to clone the code and not use cache.
@@ -28,14 +28,14 @@ ADD https://api.github.com/repos/multimodallearning/pytorch-mask-rcnn/git/refs/h
 RUN git clone https://github.com/multimodallearning/pytorch-mask-rcnn
 #Build stuff
 RUN cd pytorch-mask-rcnn/nms/src/cuda/ &&\
-    nvcc -c -o nms_kernel.cu.o nms_kernel.cu -x cu -Xcompiler -fPIC -arch="{gpu_arch}" &&\
+    nvcc -c -o nms_kernel.cu.o nms_kernel.cu -x cu -Xcompiler -fPIC -arch="${gpu_arch}" &&\
     cd ../../ &&\
-    python build.py &&\
+    python3 build.py &&\
     cd ../
 RUN cd pytorch-mask-rcnn/roialign/roi_align/src/cuda/ &&\
-     nvcc -c -o crop_and_resize_kernel.cu.o crop_and_resize_kernel.cu -x cu -Xcompiler -fPIC -arch="{gpu_arch}" &&\
-    cd ../../ &&\
-    python build.py &&\
+    nvcc -c -o crop_and_resize_kernel.cu.o crop_and_resize_kernel.cu -x cu -Xcompiler -fPIC -arch="${gpu_arch}" &&\
+  	cd ../../ &&\
+    python3 build.py &&\
     cd ../../
 #All users can run the code (in case the --user argument is used at runtime to have access to data.)
 RUN chmod -R o+rw pytorch-mask-rcnn
