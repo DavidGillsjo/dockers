@@ -1,4 +1,4 @@
-FROM nvidia/cuda:9.2-cudnn7-devel
+FROM nvidia/cuda:8.0-cudnn7-devel
 
 # Arguments
 ARG user=pytorch
@@ -26,6 +26,10 @@ WORKDIR "/ws"
 ADD https://api.github.com/repos/multimodallearning/pytorch-mask-rcnn/git/refs/heads/master version.json
 #Download code
 RUN git clone https://github.com/multimodallearning/pytorch-mask-rcnn
+#Get weights
+RUN mkdir pytorch-mask-rcnn/models
+RUN wget -nv "https://drive.google.com/open?id=1VV6WgX_RNl6a9Yi9-Pe7ZyVKHRJZSKkm" -O "pytorch-mask-rcnn/models/mask_rcnn_coco.pth"
+RUN wget -nv "https://drive.google.com/open?id=12veVlnggRRaghRRyDIWTQkuxT8WSzIw6" -O "pytorch-mask-rcnn/models/resnet50_imagenet.pth"
 #Build stuff
 RUN cd pytorch-mask-rcnn/nms/src/cuda/ &&\
     nvcc -c -o nms_kernel.cu.o nms_kernel.cu -x cu -Xcompiler -fPIC -arch="${gpu_arch}" &&\
@@ -39,11 +43,6 @@ RUN cd pytorch-mask-rcnn/roialign/roi_align/src/cuda/ &&\
     cd ../../
 #All users can run the code (in case the --user argument is used at runtime to have access to data.)
 RUN chmod -R o+rw pytorch-mask-rcnn
-
-#Get weights
-RUN mkdir pytorch-mask-rcnn/models
-RUN wget -nv "https://drive.google.com/open?id=1VV6WgX_RNl6a9Yi9-Pe7ZyVKHRJZSKkm" -O "pytorch-mask-rcnn/models/mask_rcnn_coco.pth"
-RUN wget -nv "https://drive.google.com/open?id=12veVlnggRRaghRRyDIWTQkuxT8WSzIw6" -O "pytorch-mask-rcnn/models/resnet50_imagenet.pth"
 
 VOLUME data
 VOLUME host_home
