@@ -19,17 +19,25 @@ RUN apt-get update && apt-get install -y \
 	apt-get autoremove && \
 	rm -rf /var/lib/apt/lists/*
 
+# Torch stuff
 RUN pip3 install torch torchvision numpy scipy matplotlib scikit-image h5py cffi
+# Coco stuff
+RUN pip3 install Cython
+RUN pip3 install pycocotools
+# gdrive dependency
+RUN pip3 install requests
 
 WORKDIR "/ws"
 # Changes when we update the repo, forces docker to clone the code and not use cache.
 ADD https://api.github.com/repos/multimodallearning/pytorch-mask-rcnn/git/refs/heads/master version.json
 #Download code
 RUN git clone https://github.com/multimodallearning/pytorch-mask-rcnn
+
 #Get weights
-RUN mkdir pytorch-mask-rcnn/models
-RUN wget -nv "https://drive.google.com/open?id=1VV6WgX_RNl6a9Yi9-Pe7ZyVKHRJZSKkm" -O "pytorch-mask-rcnn/models/mask_rcnn_coco.pth"
-RUN wget -nv "https://drive.google.com/open?id=12veVlnggRRaghRRyDIWTQkuxT8WSzIw6" -O "pytorch-mask-rcnn/models/resnet50_imagenet.pth"
+COPY google_drive.py .
+RUN python3 google_drive.py "1VV6WgX_RNl6a9Yi9-Pe7ZyVKHRJZSKkm" "pytorch-mask-rcnn/mask_rcnn_coco.pth"
+RUN python3 google_drive.py "12veVlnggRRaghRRyDIWTQkuxT8WSzIw6" "pytorch-mask-rcnn/resnet50_imagenet.pth"
+
 #Build stuff
 RUN cd pytorch-mask-rcnn/nms/src/cuda/ &&\
     nvcc -c -o nms_kernel.cu.o nms_kernel.cu -x cu -Xcompiler -fPIC -arch="${gpu_arch}" &&\
