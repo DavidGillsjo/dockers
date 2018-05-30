@@ -5,6 +5,12 @@ if [ -z $IMAGE ] ; then
   exit
 fi
 
+if [ "${USE_NVIDIA}" == 1 ] ; then
+  DOCKER_CALL="nvidia-docker"
+else
+  DOCKER_CALL="docker"
+fi
+
 MY_USER=${DUSER-$USER}
 
 if [ -z $(id -g $MY_USER) ]
@@ -20,6 +26,6 @@ else
 fi
 
 echo ${IMAGE}
-docker build ${BUILD_ARGS}\
+${DOCKER_CALL} build ${BUILD_ARGS}\
   -t ${IMAGE}\
    "$@" ${DOCKERFILE-.}

@@ -55,9 +55,6 @@ RUN chmod -R o+rw pytorch-mask-rcnn
 VOLUME data
 VOLUME host_home
 
-# No need for interactive backend in matplotlib
-#ENV MPLBACKEND "Agg"
-
 # Setup user
 RUN export uid="${uid}" gid="${gid}" && \
     groupadd -g "${gid}" "${user}" && \
@@ -65,7 +62,7 @@ RUN export uid="${uid}" gid="${gid}" && \
     passwd -d "${user}" && \
     usermod -aG sudo "${user}"
 
-RUN chown "${uid}:${gid}" "/ws"
+RUN chown -R "${uid}:${gid}" "/ws"
 USER "${uid}"
 
 # Setup entrypoint
