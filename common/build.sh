@@ -25,6 +25,9 @@ else
               --build-arg user=$MY_USER"
 fi
 
+#Copy the common folder to build context
+cp -r ../common ./
+
 echo ${IMAGE}
 ${DOCKER_CALL} build ${BUILD_ARGS}\
   -t ${IMAGE}\

@@ -34,7 +34,7 @@ ADD https://api.github.com/repos/multimodallearning/pytorch-mask-rcnn/git/refs/h
 RUN git clone https://github.com/multimodallearning/pytorch-mask-rcnn
 
 #Get weights
-COPY google_drive.py .
+COPY common/google_drive.py .
 RUN python3 google_drive.py "1VV6WgX_RNl6a9Yi9-Pe7ZyVKHRJZSKkm" "pytorch-mask-rcnn/mask_rcnn_coco.pth"
 RUN python3 google_drive.py "12veVlnggRRaghRRyDIWTQkuxT8WSzIw6" "pytorch-mask-rcnn/resnet50_imagenet.pth"
 
