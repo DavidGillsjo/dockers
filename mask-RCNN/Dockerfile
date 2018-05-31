@@ -22,27 +22,39 @@ RUN apt-get update && apt-get install -y \
 
 # gdrive dependency
 RUN pip3 install requests
-
 #Install repo dependencies
-ADD https://raw.githubusercontent.com/lichengunc/mask-faster-rcnn/master/requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
-RUN pip3 install cffi
+RUN pip3 install \
+		cffi \
+		pytorch \
+		torchvision \
+		cython \
+		matplotlib \
+		numpy \
+		scipy \
+		opencv \
+		pyyaml \
+		packaging \
+		pycocotools \
+		tensorboardX \
+		argparse_color_formater \
+		colorama
 
 WORKDIR "/ws"
 # Changes when we update the repo, forces docker to clone the code and not use cache.
-ADD https://api.github.com/repos/lichengunc/mask-faster-rcnn/git/refs/heads/master version.json
+ADD https://api.github.com/repos/roytseng-tw/Detectron.pytorch/git/refs/heads/master version.json
 #Download code
-RUN git clone --recursive https://github.com/lichengunc/mask-faster-rcnn
+RUN git clone --recursive git@github.com:roytseng-tw/Detectron.pytorch.git detectron
 
+#Create data mkdir
+RUN mkdir -p detectron/data/pretrained_model
 
 #Get weights
 COPY common/google_drive.py .
-RUN mkdir -p mask-faster-rcnn/data/imagenet_weights &&\
-  	python3 google_drive.py "0B7fNdx_jAqhtaXZ4aWppWV96czg" "mask-faster-rcnn/data/imagenet_weights/res101.pth"
-RUN mkdir -p "mask-faster-rcnn/output/res101/coco_2014_train_minus_refer_valtest+coco_2014_valminusminival/notime" &&\
-		cd "mask-faster-rcnn/output/res101/coco_2014_train_minus_refer_valtest+coco_2014_valminusminival/notime" &&\
-		wget -nv "http://bvision.cs.unc.edu/licheng/MattNet/pytorch_mask_rcnn/res101_mask_rcnn_iter_1250k.zip" &&\
-		unzip -q "res101_mask_rcnn_iter_1250k.zip"
+RUN cd detectron &&\
+		python tools/download_imagenet_weights.py
+RUN wget -nv \
+		"https://s3-us-west-2.amazonaws.com/detectron/35861858/12_2017_baselines/e2e_mask_rcnn_R-101-FPN_2x.yaml.02_32_51.SgT4y1cO/output/train/coco_2014_train%3Acoco_2014_valminusminival/generalized_rcnn/model_final.pkl" \
+		e2e_mask_rcnn_R-101-FPN_2x.pkl
 
 
 #Link python to python3
@@ -50,11 +62,11 @@ RUN echo -e '#!/bin/bash\npython3 "$@"' > /usr/bin/python && \
     chmod +x /usr/bin/python
 
 #Build stuff
-RUN cd mask-faster-rcnn/lib &&\
-		make
+RUN cd detectron/lib &&\
+		sh make.sh
 
 #All users can run the code (in case the --user argument is used at runtime to have access to data.)
-RUN chmod -R o+rw mask-faster-rcnn
+RUN chmod -R o+rw detectron
 
 VOLUME data
 VOLUME host_home
