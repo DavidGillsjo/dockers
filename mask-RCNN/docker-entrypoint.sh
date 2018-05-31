@@ -5,7 +5,7 @@ set -e
 if [ "$1" = 'bash' ]; then
   exec "$@"
 else
-  cd pytorch-mask-rcnn
+  cd mask-faster-rcnn
   if [ -z "$2" ]; then
     python3
   else

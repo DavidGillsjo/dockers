@@ -14,43 +14,47 @@ RUN apt-get update && apt-get install -y \
     python3-pip\
     sudo\
 		vim\
+		unzip\
 		&& \
 	apt-get clean && \
 	apt-get autoremove && \
 	rm -rf /var/lib/apt/lists/*
 
-# Torch stuff
-RUN pip3 install torch torchvision numpy scipy matplotlib scikit-image h5py cffi
-# Coco stuff
-RUN pip3 install Cython
-RUN pip3 install pycocotools
 # gdrive dependency
 RUN pip3 install requests
 
+#Install repo dependencies
+ADD https://raw.githubusercontent.com/lichengunc/mask-faster-rcnn/master/requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
+RUN pip3 install cffi
+
 WORKDIR "/ws"
 # Changes when we update the repo, forces docker to clone the code and not use cache.
-ADD https://api.github.com/repos/multimodallearning/pytorch-mask-rcnn/git/refs/heads/master version.json
+ADD https://api.github.com/repos/lichengunc/mask-faster-rcnn/git/refs/heads/master version.json
 #Download code
-RUN git clone https://github.com/multimodallearning/pytorch-mask-rcnn
+RUN git clone --recursive https://github.com/lichengunc/mask-faster-rcnn
+
 
 #Get weights
 COPY common/google_drive.py .
-RUN python3 google_drive.py "1VV6WgX_RNl6a9Yi9-Pe7ZyVKHRJZSKkm" "pytorch-mask-rcnn/mask_rcnn_coco.pth"
-RUN python3 google_drive.py "12veVlnggRRaghRRyDIWTQkuxT8WSzIw6" "pytorch-mask-rcnn/resnet50_imagenet.pth"
+RUN mkdir -p mask-faster-rcnn/data/imagenet_weights &&\
+  	python3 google_drive.py "0B7fNdx_jAqhtaXZ4aWppWV96czg" "mask-faster-rcnn/data/imagenet_weights/res101.pth"
+RUN mkdir -p "mask-faster-rcnn/output/res101/coco_2014_train_minus_refer_valtest+coco_2014_valminusminival/notime" &&\
+		cd "mask-faster-rcnn/output/res101/coco_2014_train_minus_refer_valtest+coco_2014_valminusminival/notime" &&\
+		wget -nv "http://bvision.cs.unc.edu/licheng/MattNet/pytorch_mask_rcnn/res101_mask_rcnn_iter_1250k.zip" &&\
+		unzip -q "res101_mask_rcnn_iter_1250k.zip"
+
+
+#Link python to python3
+RUN echo -e '#!/bin/bash\npython3 "$@"' > /usr/bin/python && \
+    chmod +x /usr/bin/python
 
 #Build stuff
-RUN cd pytorch-mask-rcnn/nms/src/cuda/ &&\
-    nvcc -c -o nms_kernel.cu.o nms_kernel.cu -x cu -Xcompiler -fPIC -arch="${gpu_arch}" &&\
-    cd ../../ &&\
-    python3 build.py &&\
-    cd ../
-RUN cd pytorch-mask-rcnn/roialign/roi_align/src/cuda/ &&\
-    nvcc -c -o crop_and_resize_kernel.cu.o crop_and_resize_kernel.cu -x cu -Xcompiler -fPIC -arch="${gpu_arch}" &&\
-  	cd ../../ &&\
-    python3 build.py &&\
-    cd ../../
+RUN cd mask-faster-rcnn/lib &&\
+		make
+
 #All users can run the code (in case the --user argument is used at runtime to have access to data.)
-RUN chmod -R o+rw pytorch-mask-rcnn
+RUN chmod -R o+rw mask-faster-rcnn
 
 VOLUME data
 VOLUME host_home
