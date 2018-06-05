@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     sudo\
 		vim\
 		unzip\
+		libgtk2.0\
 		&& \
 	apt-get clean && \
 	apt-get autoremove && \
@@ -24,52 +25,20 @@ RUN apt-get update && apt-get install -y \
 RUN pip3 install requests
 #Install repo dependencies
 RUN pip3 install \
+		opencv-python-headless\
 		cffi \
-		pytorch \
+		torch \
 		torchvision \
-		cython \
+		Cython \
 		matplotlib \
 		numpy \
 		scipy \
-		opencv \
 		pyyaml \
 		packaging \
-		pycocotools \
 		tensorboardX \
-		argparse_color_formater \
+		argparse-color-formatter \
 		colorama
-
-WORKDIR "/ws"
-# Changes when we update the repo, forces docker to clone the code and not use cache.
-ADD https://api.github.com/repos/roytseng-tw/Detectron.pytorch/git/refs/heads/master version.json
-#Download code
-RUN git clone --recursive git@github.com:roytseng-tw/Detectron.pytorch.git detectron
-
-#Create data mkdir
-RUN mkdir -p detectron/data/pretrained_model
-
-#Get weights
-COPY common/google_drive.py .
-RUN cd detectron &&\
-		python tools/download_imagenet_weights.py
-RUN wget -nv \
-		"https://s3-us-west-2.amazonaws.com/detectron/35861858/12_2017_baselines/e2e_mask_rcnn_R-101-FPN_2x.yaml.02_32_51.SgT4y1cO/output/train/coco_2014_train%3Acoco_2014_valminusminival/generalized_rcnn/model_final.pkl" \
-		e2e_mask_rcnn_R-101-FPN_2x.pkl
-
-
-#Link python to python3
-RUN echo -e '#!/bin/bash\npython3 "$@"' > /usr/bin/python && \
-    chmod +x /usr/bin/python
-
-#Build stuff
-RUN cd detectron/lib &&\
-		sh make.sh
-
-#All users can run the code (in case the --user argument is used at runtime to have access to data.)
-RUN chmod -R o+rw detectron
-
-VOLUME data
-VOLUME host_home
+RUN pip3 install pycocotools
 
 # Setup user
 RUN export uid="${uid}" gid="${gid}" && \
@@ -78,9 +47,38 @@ RUN export uid="${uid}" gid="${gid}" && \
     passwd -d "${user}" && \
     usermod -aG sudo "${user}"
 
-RUN chown -R "${uid}:${gid}" "/ws"
+# ------------- Skip for now, we will use code on host --------------
+# WORKDIR "/ws"
+# # Changes when we update the repo, forces docker to clone the code and not use cache.
+# ADD https://api.github.com/repos/roytseng-tw/Detectron.pytorch/git/refs/heads/master version.json
+# #Download code
+# RUN git clone --recursive https://github.com/roytseng-tw/Detectron.pytorch.git detectron
+#
+# #Create data mkdir
+# RUN mkdir -p detectron/data/pretrained_model
+#
+# #Get weights
+# RUN cd detectron &&\
+# 		python3 tools/download_imagenet_weights.py
+# RUN wget -nv \
+# 		"https://s3-us-west-2.amazonaws.com/detectron/35861858/12_2017_baselines/e2e_mask_rcnn_R-101-FPN_2x.yaml.02_32_51.SgT4y1cO/output/train/coco_2014_train%3Acoco_2014_valminusminival/generalized_rcnn/model_final.pkl" \
+# 		-O detectron/data/pretrained_model/e2e_mask_rcnn_R-101-FPN_2x.pkl
+#
+# #Build stuff
+# RUN cd detectron/lib &&\
+# 		sh make.sh
+#
+# #All users can run the code (in case the --user argument is used at runtime to have access to data.)
+# RUN chmod -R o+rw detectron
+# RUN chown -R "${uid}:${gid}" "/ws"
+# --------------------------------------------------------------------
+
 USER "${uid}"
 
 # Setup entrypoint
-COPY docker-entrypoint.sh /ws/docker-entrypoint.sh
-ENTRYPOINT ["/ws/docker-entrypoint.sh"]
+# COPY docker-entrypoint.sh /ws/docker-entrypoint.sh
+# ENTRYPOINT ["/ws/docker-entrypoint.sh"]
+CMD bash
+
+VOLUME data
+VOLUME host_home
