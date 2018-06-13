@@ -37,6 +37,7 @@ RUN pip3 install \
 		packaging \
 		tensorboardX \
 		argparse-color-formatter \
+		git+git://github.com/waspinator/pycococreator.git@0.2.0 \
 		colorama
 RUN pip3 install pycocotools
 
