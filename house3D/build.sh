@@ -1,2 +1,2 @@
 #!/bin/bash
-IMAGE=${IMAGE-house3D} ./../common/build.sh "$@"
+IMAGE=${IMAGE-house3d} ./../common/build.sh "$@"
