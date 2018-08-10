@@ -35,6 +35,7 @@ RUN pip3 install \
 		scipy \
 		pyyaml \
 		packaging \
+		tensorflow \
 		tensorboardX \
 		argparse-color-formatter \
 		git+git://github.com/waspinator/pycococreator.git@0.2.0 \

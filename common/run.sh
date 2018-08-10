@@ -14,6 +14,7 @@ fi
 if [ "${USE_NVIDIA}" == 1 ] ; then
   DOCKER_CALL="nvidia-docker"
   XDISPLAY_OPT=""
+  SHM_OPT="--shm-size 8G"
 else
   DOCKER_CALL="docker"
   XDISPLAY_OPT="--volume=/dev/dri:/dev/dri:rw \
@@ -22,6 +23,7 @@ else
                 --volume=$XSOCK:$XSOCK:rw \
                 --env=DISPLAY \
                 --env='QT_X11_NO_MITSHM=1'"
+  SHM_OPT=""
 fi
 
 # Use $USER unless run with sudo
@@ -54,11 +56,15 @@ else
 fi
 echo
 #Run!
+#Ports:
+#6006 -> Tensorflow
 ${DOCKER_CALL} run --rm -it \
         ${NAME_OPT}\
         -v "${DATA-/tmp/data}:/data:rw"\
         -p "8000-9000:8888"\
+        -p "0.0.0.0:6000-7000:6006"\
         ${USER_OPT}\
         ${HOME_OPT}\
         ${XDISPLAY_OPT}\
+        ${SHM_OPT}\
         "${IMAGE}" "$@"

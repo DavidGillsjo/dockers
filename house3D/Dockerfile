@@ -28,7 +28,9 @@ RUN apt-get update && apt-get install -y \
 # Python dependencies
 RUN pip3 install\
 	opencv-python-headless\
-	tqdm
+	tqdm\
+	scikit-fmm\
+	matplotlib
 
 RUN git clone https://github.com/facebookresearch/House3D.git
 RUN cd House3D && \
