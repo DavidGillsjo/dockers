@@ -27,7 +27,8 @@ RUN pip3 install requests
 RUN pip3 install \
 		opencv-python-headless\
 		cffi \
-		torch \
+		#Detectron only works with Torch 0.4.0
+		torch==0.4.0 \
 		torchvision \
 		Cython \
 		matplotlib \

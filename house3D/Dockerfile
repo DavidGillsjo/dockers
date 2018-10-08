@@ -3,7 +3,7 @@ FROM nvidia/opengl:1.0-glvnd-devel-ubuntu16.04
 ARG user=docker
 ARG uid=1000
 ARG gid=1000
-ARG gpu_arch=sm_61
+ARG gpu_arch=sm_52
 
 # Install some dependencies
 RUN apt-get update && apt-get install -y \
@@ -27,10 +27,17 @@ RUN apt-get update && apt-get install -y \
 
 # Python dependencies
 RUN pip3 install\
+	numpy\
 	opencv-python-headless\
 	tqdm\
-	scikit-fmm\
+	pyyaml\
+	git+git://github.com/waspinator/pycococreator.git@0.2.0\
+	Cython\
 	matplotlib
+#Numpy prereq for scikit-fmm
+RUN pip3 install\
+	scikit-fmm\
+	pycocotools
 
 RUN git clone https://github.com/facebookresearch/House3D.git
 RUN cd House3D && \
