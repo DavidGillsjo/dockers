@@ -39,6 +39,7 @@ RUN apt-get update && apt-get install -y --allow-unauthenticated \
 RUN pip3 install \
 		matplotlib \
 		scipy \
+		pyquaternion \
 		numpy
 
 # Install ceres
