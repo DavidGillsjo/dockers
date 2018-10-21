@@ -8,6 +8,7 @@ ARG gid=1000
 RUN apt-get update && apt-get install -y --allow-unauthenticated \
 		sudo \
 		python3 \
+		python3-pip \
 		git \
 		cmake \
 		build-essential \
@@ -35,6 +36,11 @@ RUN apt-get update && apt-get install -y --allow-unauthenticated \
 	apt-get autoremove && \
 	rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install \
+		matplotlib \
+		scipy \
+		numpy
+
 # Install ceres
 ADD https://api.github.com/repos/ceres-solver/ceres-solver/git/refs/heads/master version_ceres.json
 RUN git clone https://ceres-solver.googlesource.com/ceres-solver
@@ -57,6 +63,7 @@ RUN cd colmap &&\
 		make &&\
 		make install
 RUN chown -R  "${uid}" colmap
+ENV PYTHONPATH="$PYTHONPATH:/colmap/scripts/python"
 
 VOLUME data
 VOLUME host_home
