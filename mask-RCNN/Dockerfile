@@ -26,6 +26,7 @@ RUN pip3 install requests
 #Install repo dependencies
 RUN pip3 install \
 		opencv-python-headless\
+		pyquaternion\
 		cffi \
 		#Detectron only works with Torch 0.4.0
 		torch==0.4.0 \
@@ -34,6 +35,7 @@ RUN pip3 install \
 		matplotlib \
 		numpy \
 		scipy \
+		scikit-learn \
 		pyyaml \
 		packaging \
 		tensorflow \
