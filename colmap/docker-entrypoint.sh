@@ -7,5 +7,5 @@ if [ "$1" = 'bash' ]; then
 elif [ "$1" = 'colmap' ]; then
   exec colmap "$@"
 else
-  exec python3 predict.py "$@"
+  exec python3 run_colmap.py "$@"
 fi
