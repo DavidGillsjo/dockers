@@ -10,7 +10,7 @@ It can be pulled from dockerhub or build locally.
 Building locally enables you to clone your host machine user properly.
 
 ## Usage
-See [a relative link](../README.md) for general usage. Some specific use cases below.
+See [here](../README.md) for general usage. Some specific use cases below.
 
 Batch process folder of jpg images mounted in DATA:
 ```

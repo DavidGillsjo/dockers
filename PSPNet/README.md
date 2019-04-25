@@ -6,7 +6,7 @@ of the original repo:
 
 https://github.com/Vladkryvoruchko/PSPNet-Keras-tensorflow.
 ## Usage
-See [a relative link](../README.md) for general usage. Some specific use cases below.
+See [here](../README.md) for general usage. Some specific use cases below.
 
 Batch process folder of jpg images mounted in DATA and skip rescaling (for increased speed):
 ```
