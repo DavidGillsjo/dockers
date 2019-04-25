@@ -54,15 +54,15 @@ if [ -z $CNAME ] ; then
 else
   NAME_OPT=""
 fi
-echo
 #Run!
 #Ports:
 #6006 -> Tensorflow
+# -p "0.0.0.0:6000-7000:6006"\
 ${DOCKER_CALL} run --rm -it \
         ${NAME_OPT}\
         -v "${DATA-/tmp/data}:/data:rw"\
-        -p "8000-9000:8888"\
-        -p "0.0.0.0:6000-7000:6006"\
+        -p "8001-9000:8888"\
+        -p "0.0.0.0:6001-7000:6006"\
         ${USER_OPT}\
         ${HOME_OPT}\
         ${XDISPLAY_OPT}\

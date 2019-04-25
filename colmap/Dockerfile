@@ -79,4 +79,8 @@ RUN export uid="${uid}" gid="${gid}" && \
 USER "${uid}"
 
 # Setup entrypoint
-CMD bash
+COPY run_colmap.py /
+COPY docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["--help"]
