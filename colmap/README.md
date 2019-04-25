@@ -1,7 +1,7 @@
 # COLMAP docker
 This docker image is running colmap from https://github.com/colmap/colmap.git.
 
-##Usage
+## Usage
 See [a relative link](../README.md) for general usage. Some specific use cases below.
 
 Batch process some folders placed in 'data/*/raw':
