@@ -39,21 +39,14 @@ RUN pip3 install\
 	scikit-fmm\
 	pycocotools
 
-RUN git clone https://github.com/facebookresearch/House3D.git
-RUN cd House3D && \
-		pip3 install .
+#SSC stuff
+RUN pip3 install\
+	shapely\
+	pywavefront
+
 
 VOLUME data
 VOLUME host_home
-
-#Nvidia EGL support
-# ENV NVIDIA_DRIVER_CAPABILITIES=compute,graphics,utility,video
-# LABEL com.nvidia.volumes.needed="nvidia_driver"
-# ENV PATH /usr/local/nvidia/bin:${PATH}
-# ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
-
-# No need for interactive backend in matplotlib
-#ENV MPLBACKEND "Agg"
 
 # Setup user
 RUN export uid="${uid}" gid="${gid}" && \
