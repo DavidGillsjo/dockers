@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import logging
 import sys
+import threading
 
 
 def parse_args():
@@ -34,21 +35,37 @@ def parse_args():
 
     return args
 
-class StreamToLogger(object):
-   """
-   Fake file-like stream object that redirects writes to a logger instance.
-   """
-   def __init__(self, logger, log_level=logging.INFO):
-      self.logger = logger
-      self.log_level = log_level
-      self.linebuf = ''
+class LogPipe(threading.Thread):
 
-   def write(self, buf):
-      for line in buf.rstrip().splitlines():
-         self.logger.log(self.log_level, line.rstrip())
+    def __init__(self, level, logger):
+        """Setup the object with a logger and a loglevel
+        and start the thread
+        """
+        threading.Thread.__init__(self)
+        self.daemon = False
+        self.level = level
+        self.fdRead, self.fdWrite = os.pipe()
+        self.pipeReader = os.fdopen(self.fdRead)
+        self.logger = logger
+        self.start()
 
-   def flush(self):
-       pass
+    def fileno(self):
+        """Return the write file descriptor of the pipe
+        """
+        return self.fdWrite
+
+    def run(self):
+        """Run the thread, logging everything.
+        """
+        for line in iter(self.pipeReader.readline, ''):
+            self.logger.log(self.level, line.strip('\n'))
+
+        self.pipeReader.close()
+
+    def close(self):
+        """Close the write end of the pipe.
+        """
+        os.close(self.fdWrite)
 
 def setup_mp_logger(logfile = None):
     logger = mp.get_logger()
@@ -57,8 +74,8 @@ def setup_mp_logger(logfile = None):
         file_h = logging.FileHandler(logfile, mode='w')
         file_h.setFormatter( logging.Formatter('[%(asctime)s][%(levelname)s/%(processName)s] %(message)s'))
         logger.addHandler(file_h)
-        sys.stdout = StreamToLogger(logger, logging.INFO)
-        sys.stderr = StreamToLogger(logger, logging.ERROR)
+        # sys.stdout = StreamToLogger(logger, logging.INFO)
+        # sys.stderr = StreamToLogger(logger, logging.ERROR)
     else:
         stream_h = logging.StreamHandler(sys.stdout)
         stream_h.setFormatter( logging.Formatter('[%(asctime)s][%(levelname)s/%(processName)s] %(message)s'))
@@ -90,7 +107,9 @@ class Colmap(mp.Process):
         return s
 
     def run_cmd(self, cmd):
-        proc = subprocess.Popen(cmd, shell = True)
+        proc = subprocess.Popen(cmd, shell = True,
+                                stdout = LogPipe(logging.INFO, self.logger),
+                                stderr = LogPipe(logging.ERROR, self.logger))
 
         try:
             while proc.poll() is None:
@@ -136,6 +155,8 @@ if __name__ == '__main__':
     else:
         img_dir_list = [args.img_dir]
 
+    nbr_proc = min(args.nbr_proc, len(img_dir_list))
+
     work_queue = mp.Queue()
     for img_dir in img_dir_list:
         work_queue.put(img_dir)
@@ -146,7 +167,7 @@ if __name__ == '__main__':
         # Create new process list
         alive_p = [p for p in procs if p.is_alive()]
         # Fill up with missing
-        for new_i in range(args.nbr_proc - len(alive_p)):
+        for new_i in range(nbr_proc - len(alive_p)):
             p = Colmap(work_queue, args.res_dir, logger, dense = args.dense)
             alive_p.append(p)
             p.start()
