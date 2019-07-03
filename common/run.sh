@@ -61,6 +61,7 @@ fi
 ${DOCKER_CALL} run --rm -it \
         ${NAME_OPT}\
         -v "${DATA-/tmp/data}:/data:rw"\
+        -v "/etc/localtime:/etc/localtime:ro"\
         -p "8001-9000:8888"\
         -p "0.0.0.0:6001-7000:6006"\
         ${USER_OPT}\
