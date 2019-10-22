@@ -12,11 +12,11 @@ if [ -z $IMAGE ] ; then
 fi
 
 if [ "${USE_NVIDIA}" == 1 ] ; then
-  DOCKER_CALL="nvidia-docker"
+  NVIDIA_ARGS="--gpus all"
   XDISPLAY_OPT=""
   SHM_OPT="--shm-size 8G"
 else
-  DOCKER_CALL="docker"
+  NVIDIA_ARGS=""
   XDISPLAY_OPT="--volume=/dev/dri:/dev/dri:rw \
                 --volume=$XAUTH:$XAUTH:rw \
                 --env=XAUTHORITY=${XAUTH} \
@@ -58,12 +58,13 @@ fi
 #Ports:
 #6006 -> Tensorflow
 # -p "0.0.0.0:6000-7000:6006"\
-${DOCKER_CALL} run --rm -it \
+docker run --rm -it \
         ${NAME_OPT}\
         -v "${DATA-/tmp/data}:/data:rw"\
         -v "/etc/localtime:/etc/localtime:ro"\
         -p "8001-9000:8888"\
         ${USER_OPT}\
+        ${NVIDIA_ARGS}\
         ${HOME_OPT}\
         ${XDISPLAY_OPT}\
         ${SHM_OPT}\

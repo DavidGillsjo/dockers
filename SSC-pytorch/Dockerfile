@@ -4,7 +4,7 @@ FROM nvidia/cudagl:10.1-devel-ubuntu18.04
 ARG user=pytorch
 ARG uid=1000
 ARG gid=1000
-ARG gpu_arch=sm_61
+ARG gpu_arch=sm_70
 
 ENV DEBIAN_FRONTEND noninteractive
 
