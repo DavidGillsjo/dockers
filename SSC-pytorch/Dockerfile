@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y \
 		freeglut3-dev\
 		mesa-common-dev\
 		libosmesa6-dev\
+		xvfb\
 		&& \
 	apt-get clean && \
 	apt-get autoremove && \
@@ -44,10 +45,7 @@ RUN pip3 install --no-cache-dir\
 		gitpython \
 		sklearn \
     moviepy \
-    pyopengl \
-		vispy
-
-
+		mayavi
 
 
 # Setup user
@@ -57,12 +55,14 @@ RUN export uid="${uid}" gid="${gid}" && \
     passwd -d "${user}" && \
     usermod -aG sudo "${user}"
 
+# Setup bkg script to get X virtual frame buffer
+ENV DISPLAY :1
+COPY bkg.sh /
+
+# Switch to user
 USER "${uid}"
 
-# Setup entrypoint
-# COPY docker-entrypoint.sh /ws/docker-entrypoint.sh
-# ENTRYPOINT ["/ws/docker-entrypoint.sh"]
-CMD bash
+CMD sudo ./bkg.sh & bash
 
 VOLUME data
 VOLUME host_home
