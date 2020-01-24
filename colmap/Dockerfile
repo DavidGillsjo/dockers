@@ -1,4 +1,4 @@
-FROM nvidia/cuda:8.0-cudnn7-devel
+FROM nvidia/cuda:10.2-cudnn7-devel
 # Arguments
 ARG user=docker
 ARG uid=1000
@@ -36,7 +36,8 @@ RUN apt-get update && apt-get install -y --allow-unauthenticated \
 	apt-get autoremove && \
 	rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install \
+RUN pip3 install --upgrade pip
+RUN pip3 install\
 		matplotlib \
 		scipy \
 		pyquaternion \
@@ -55,9 +56,8 @@ RUN cd ceres-solver &&\
 
 #Install colmap
 ADD https://api.github.com/repos/colmap/colmap/git/refs/heads/master version_colmap.json
-RUN git clone https://github.com/colmap/colmap.git
+RUN git clone https://github.com/colmap/colmap.git --branch master
 RUN cd colmap &&\
-		git checkout dev &&\
 		mkdir build &&\
 		cd build &&\
 		cmake .. &&\
