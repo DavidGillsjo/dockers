@@ -57,7 +57,8 @@ ENV LD_LIBRARY_PATH /usr/lib/x86_64-linux-gnu:/usr/lib/i386-linux-gnu${LD_LIBRAR
 
 #Install VTK with EGL support
 RUN git clone https://gitlab.kitware.com/vtk/vtk.git --branch v8.2.0
-RUN mkdir /vtk/build && cd /vtk/build && \
+COPY vtk_setup.py /vtk/build/setup.py
+RUN cd /vtk/build && \
     cmake \
 		-DVTK_OPENGL_HAS_EGL:BOOL=ON\
 		-DVTK_USE_X:BOOL=OFF\
@@ -70,7 +71,8 @@ RUN mkdir /vtk/build && cd /vtk/build && \
 		-DVTK_PYTHON_SITE_PACKAGES_SUFFIX="python$PYTHON_VERSION/dist-packages"\
 		.. &&\
 		make install -j"$(nproc)" &&\
-		ldconfig
+		ldconfig &&\
+		python3 setup.py install
 
 #Install repo dependencies
 RUN pip3 install --no-cache-dir\
@@ -88,16 +90,7 @@ RUN pip3 install --no-cache-dir\
 		gitpython \
 		sklearn \
     moviepy \
-		seaborn
-
-#Install mayavi without package check, could not get VTK package build to work.
-RUN pip3 install --no-cache-dir --no-deps\
-	  apptools\
-		envisage\
-		pyface\
-		pygments\
-		traits\
-		traitsui\
+		seaborn\
 		mayavi
 
 # Setup user
