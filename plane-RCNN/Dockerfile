@@ -6,7 +6,7 @@ ARG uid=1000
 ARG gid=1000
 
 #Default GPU arch, can be changed later
-ENV GPU_ARCH=sm_52
+ENV GPU_ARCH=sm_70
 
 #Remove interative elements from apt-get
 ENV DEBIAN_FRONTEND=noninteractive
@@ -41,6 +41,7 @@ RUN pip3 install "$pytorch_wheel"
 # Repo requirements
 RUN wget -nv https://raw.githubusercontent.com/NVlabs/planercnn/master/requirements.txt
 RUN pip3 install -r requirements.txt
+RUN pip3 install h5py
 
 # Setup user
 RUN export uid="${uid}" gid="${gid}" && \
