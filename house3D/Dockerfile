@@ -26,8 +26,6 @@ RUN apt-get update && apt-get install -y \
 VOLUME data
 VOLUME host_home
 
-# No need for interactive backend in matplotlib
-#ENV MPLBACKEND "Agg"
 
 # Setup user
 RUN export uid="${uid}" gid="${gid}" && \
