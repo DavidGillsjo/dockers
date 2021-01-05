@@ -18,8 +18,8 @@ RUN apt-get update && apt-get install -y \
 	rm -rf /var/lib/apt/lists/*
 
 # Install Keras
-RUN pip3 install h5py
-RUN pip3 --no-cache-dir install git+git://github.com/fchollet/keras.git
+RUN pip3 install --upgrade pip
+RUN pip3 --no-cache-dir install h5py keras==2.2.0
 
 # Setup user
 RUN export uid="${uid}" gid="${gid}" && \

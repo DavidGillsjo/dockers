@@ -1,27 +1,31 @@
 #!/bin/bash
 #Usage: [ENV_OPTS] ./run [CMD] [ARGS]
-
 #X Display stuff
+
 XSOCK=/tmp/.X11-unix
 XAUTH=/tmp/.docker.xauth
 touch $XAUTH
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+#If using X forwarding we must replace localhost with docker host IP.
+#Note that the host SSH server must have configured "X11UseLocalhost no".
+DISPLAY=`echo $DISPLAY | sed 's/^[^:]*\(.*\)/172.17.0.1\1/'`
+XDISPLAY_OPT="--volume=/dev/dri:/dev/dri:rw \
+              --volume=$XAUTH:$XAUTH:rw \
+              --env=XAUTHORITY=${XAUTH} \
+              --volume=$XSOCK:$XSOCK:rw \
+              --env=DISPLAY \
+              --env='QT_X11_NO_MITSHM=1'"
 
 if [ -z $IMAGE ] ; then
   echo "Parameter IMAGE must be specified to choose the image"
 fi
 
 if [ "${USE_NVIDIA}" == 1 ] ; then
-  DOCKER_CALL="nvidia-docker"
-  XDISPLAY_OPT=""
+  NVIDIA_ARGS="--gpus all"
+  SHM_OPT="--shm-size 8G"
 else
-  DOCKER_CALL="docker"
-  XDISPLAY_OPT="--volume=/dev/dri:/dev/dri:rw \
-                --volume=$XAUTH:$XAUTH:rw \
-                --env=XAUTHORITY=${XAUTH} \
-                --volume=$XSOCK:$XSOCK:rw \
-                --env=DISPLAY \
-                --env='QT_X11_NO_MITSHM=1'"
+  NVIDIA_ARGS=""
+  SHM_OPT=""
 fi
 
 # Use $USER unless run with sudo
@@ -33,6 +37,13 @@ if [ -z $DUSER ] ; then
   fi
 else
   USER_OPT="-u $(id -u $DUSER):$(id -g $DUSER)"
+fi
+
+#SSH port specified? See ssh_forward for usage.
+if [[ -v SSH_PORT ]] ; then
+  SSH_OPT="-p ${SSH_PORT}:22"
+else
+  SSH_OPT=""
 fi
 
 # Use $HOME unless run with sudo
@@ -52,13 +63,27 @@ if [ -z $CNAME ] ; then
 else
   NAME_OPT=""
 fi
-echo
+
+#Need to run with sudo? Useful for getting the HOME and USER options correctly detected.
+if [ -z $SUDO ] ; then
+  SUDO_OPT=""
+else
+  SUDO_OPT="sudo"
+fi
+
 #Run!
-${DOCKER_CALL} run --rm -it \
+#Ports:
+#6006 -> Tensorflow
+# -p "0.0.0.0:6000-7000:6006"\
+${SUDO_OPT} docker run --rm -it \
         ${NAME_OPT}\
         -v "${DATA-/tmp/data}:/data:rw"\
-        -p "8000-9000:8888"\
+        -v "/etc/localtime:/etc/localtime:ro"\
+        -p "8001-9000:8888"\
         ${USER_OPT}\
+        ${SSH_OPT}\
+        ${NVIDIA_ARGS}\
         ${HOME_OPT}\
         ${XDISPLAY_OPT}\
+        ${SHM_OPT}\
         "${IMAGE}" "$@"
