@@ -53,7 +53,8 @@ else
 fi
 
 #Copy the common folder to build context
-cp -r ../common ./
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cp -r "${SCRIPTDIR}/../common" ./
 
 ${SUDO_OPT} docker build ${BUILD_ARGS}\
   -t ${IMAGE}\
