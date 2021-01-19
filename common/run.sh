@@ -46,6 +46,21 @@ else
   SSH_OPT=""
 fi
 
+#Mount git preferences if running as user
+if [[ $(id -g $USER) != 0 ]] && [[ -e "${HOME}/.gitconfig" ]] ; then
+  GIT_OPT="-v ${HOME}/.gitconfig:/home/$USER/.gitconfig:ro"
+else
+  GIT_OPT=""
+fi
+
+#Mount ssh keys if running as user
+if [[ $(id -g $USER) != 0 ]] && [[ -e "${HOME}/.ssh" ]] ; then
+  SSH_KEY_OPT="-v ${HOME}/.ssh:/home/$USER/.ssh:ro"
+else
+  SSH_KEY_OPT=""
+fi
+
+
 # Use $HOME unless run with sudo
 if [ -z $DHOME ] ; then
   if [ $(id -g $USER) == 0 ] ; then
@@ -84,6 +99,8 @@ ${SUDO_OPT} docker run --rm -it \
         ${SSH_OPT}\
         ${NVIDIA_ARGS}\
         ${HOME_OPT}\
+        ${GIT_OPT}\
+        ${SSH_KEY_OPT}\
         ${XDISPLAY_OPT}\
         ${SHM_OPT}\
         "${IMAGE}" "$@"
