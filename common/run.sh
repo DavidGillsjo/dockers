@@ -8,7 +8,7 @@ touch $XAUTH
 xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 #If using X forwarding we must replace localhost with docker host IP.
 #Note that the host SSH server must have configured "X11UseLocalhost no".
-DISPLAY=`echo $DISPLAY | sed 's/^[^:]*\(.*\)/172.17.0.1\1/'`
+DISPLAY=`echo $DISPLAY | sed 's/^[^:][^:]+\(.*\)/172.17.0.1\1/'`
 XDISPLAY_OPT="--volume=/dev/dri:/dev/dri:rw \
               --volume=$XAUTH:$XAUTH:rw \
               --env=XAUTHORITY=${XAUTH} \
