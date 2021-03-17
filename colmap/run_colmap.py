@@ -28,6 +28,10 @@ def parse_args():
                         help='Number of processes')
     parser.add_argument('--skip-dense', dest='dense', action='store_false', default = True,
                         help='Skip dense reconstruction')
+    parser.add_argument('--sequential', action='store_true',
+                        help='Images are from video and considered sequential')
+    parser.add_argument('--no-gpu', dest='gpu', action='store_false', default = True,
+                        help='Skip dense reconstruction')
     parser.add_argument('--folder-pattern', type=str, default=None,
                         help='Used to batch process multiple folders. Pattern will be appended to img_dir')
 
@@ -85,12 +89,14 @@ def setup_mp_logger(logfile = None):
 
 
 class Colmap(mp.Process):
-    def __init__(self, img_queue, relative_resdir, logger, dense = True):
+    def __init__(self, img_queue, relative_resdir, logger, dense = True, sequential = False, gpu=True):
         mp.Process.__init__(self)
         self.img_queue = img_queue
         self.relative_resdir = relative_resdir
         self.logger = logger
         self.dense = dense
+        self.sequential = sequential
+        self.gpu = gpu
 
     def auto_reconstruct(self, imgdir, resdir):
         # Abort if resdir exists
@@ -125,8 +131,14 @@ class Colmap(mp.Process):
         --image_path {imgdir} \
         --workspace_path {resdir} \
         --single_camera=1 \
+        --data_type={dtype} \
+        --use_gpu={gpu} \
         --dense={dense}
-        """.format(imgdir = imgdir, resdir = resdir, dense=self.dense)
+        """.format(imgdir = imgdir,
+                   resdir = resdir,
+                   dtype = 'video' if self.sequential else 'individual',
+                   gpu = self.gpu,
+                   dense=self.dense)
         return self.run_cmd(col_cmd)
 
 
@@ -168,7 +180,7 @@ if __name__ == '__main__':
         alive_p = [p for p in procs if p.is_alive()]
         # Fill up with missing
         for new_i in range(nbr_proc - len(alive_p)):
-            p = Colmap(work_queue, args.res_dir, logger, dense = args.dense)
+            p = Colmap(work_queue, args.res_dir, logger, dense = args.dense, sequential = args.sequential, gpu=args.gpu)
             alive_p.append(p)
             p.start()
             time.sleep(0.2) # spread out spawning to ease GPU allocation

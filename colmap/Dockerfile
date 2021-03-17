@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.2-cudnn7-devel
+FROM nvidia/cuda:10.1-cudnn7-devel
 # Arguments
 ARG user=docker
 ARG uid=1000
@@ -51,7 +51,7 @@ RUN cd ceres-solver &&\
 		mkdir build &&\
 		cd build &&\
 		cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF &&\
-		make &&\
+		make -j"$(( $(nproc) / 2))" &&\
 		make install
 
 #Install colmap
@@ -61,7 +61,7 @@ RUN cd colmap &&\
 		mkdir build &&\
 		cd build &&\
 		cmake .. &&\
-		make &&\
+		make -j"$(( $(nproc) / 2))" &&\
 		make install
 RUN chown -R  "${uid}" colmap
 ENV PYTHONPATH="$PYTHONPATH:/colmap/scripts/python"
