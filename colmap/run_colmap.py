@@ -24,6 +24,8 @@ def parse_args():
                         help='Print to terminal if not specified')
     parser.add_argument('--res-dir', type=str, default=osp.join('..','colmap'),
                         help='Result dir, relative to image folder. Default: %(default)s ')
+    parser.add_argument('--camera-model', type=str, default='SIMPLE_RADIAL',
+                        help='Camera model, see https://colmap.github.io/cameras.html. Default: %(default)s ')
     parser.add_argument('--nbr-proc', type=int, default=4,
                         help='Number of processes')
     parser.add_argument('--skip-dense', dest='dense', action='store_false', default = True,
@@ -89,7 +91,7 @@ def setup_mp_logger(logfile = None):
 
 
 class Colmap(mp.Process):
-    def __init__(self, img_queue, relative_resdir, logger, dense = True, sequential = False, gpu=True):
+    def __init__(self, img_queue, relative_resdir, logger, dense = True, sequential = False, gpu=True, camera_model = 'SIMPLE_RADIAL'):
         mp.Process.__init__(self)
         self.img_queue = img_queue
         self.relative_resdir = relative_resdir
@@ -97,6 +99,7 @@ class Colmap(mp.Process):
         self.dense = dense
         self.sequential = sequential
         self.gpu = gpu
+        self.camera_model = camera_model
 
     def auto_reconstruct(self, imgdir, resdir):
         # Abort if resdir exists
@@ -107,6 +110,8 @@ class Colmap(mp.Process):
         # Use local temp dir as workspace for speed (assuming resdir is network folder)
         with tempfile.TemporaryDirectory() as tmpdir:
             s = self.auto_reconstruct_cmd(imgdir, tmpdir)
+
+            self.convert_to_txt(tmpdir)
 
             shutil.copytree(tmpdir, resdir)
 
@@ -130,17 +135,33 @@ class Colmap(mp.Process):
         col_cmd = """colmap automatic_reconstructor \
         --image_path {imgdir} \
         --workspace_path {resdir} \
-        --single_camera=1 \
-        --data_type={dtype} \
-        --use_gpu={gpu} \
-        --dense={dense}
+        --single_camera 1 \
+        --data_type {dtype} \
+        --use_gpu {gpu} \
+        --dense {dense} \
+        --camera_model {model}
         """.format(imgdir = imgdir,
                    resdir = resdir,
                    dtype = 'video' if self.sequential else 'individual',
                    gpu = self.gpu,
-                   dense=self.dense)
+                   dense=self.dense,
+                   model = self.camera_model)
         return self.run_cmd(col_cmd)
 
+
+    def convert_to_txt(self, res_dir):
+        for root, dirnames, filenames in os.walk(res_dir):
+            if 'cameras.bin' in filenames:
+                self.convert_to_txt_cmd(root)
+
+    def convert_to_txt_cmd(self, bin_dir):
+        col_cmd = """colmap model_converter \
+        --input_path {bin_dir} \
+        --output_path {bin_dir} \
+        --output_type TXT
+        """.format(bin_dir = bin_dir)
+
+        return self.run_cmd(col_cmd)
 
     def run(self):
         while True:
@@ -180,7 +201,7 @@ if __name__ == '__main__':
         alive_p = [p for p in procs if p.is_alive()]
         # Fill up with missing
         for new_i in range(nbr_proc - len(alive_p)):
-            p = Colmap(work_queue, args.res_dir, logger, dense = args.dense, sequential = args.sequential, gpu=args.gpu)
+            p = Colmap(work_queue, args.res_dir, logger, dense = args.dense, sequential = args.sequential, gpu=args.gpu, camera_model = args.camera_model)
             alive_p.append(p)
             p.start()
             time.sleep(0.2) # spread out spawning to ease GPU allocation
