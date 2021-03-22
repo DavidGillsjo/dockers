@@ -26,6 +26,8 @@ def parse_args():
                         help='Result dir, relative to image folder. Default: %(default)s ')
     parser.add_argument('--camera-model', type=str, default='SIMPLE_RADIAL',
                         help='Camera model, see https://colmap.github.io/cameras.html. Default: %(default)s ')
+    parser.add_argument('--quality', type=str, default='high',
+                        help='Reconstruction quality. Default: %(default)s ')
     parser.add_argument('--nbr-proc', type=int, default=4,
                         help='Number of processes')
     parser.add_argument('--skip-dense', dest='dense', action='store_false', default = True,
@@ -91,7 +93,7 @@ def setup_mp_logger(logfile = None):
 
 
 class Colmap(mp.Process):
-    def __init__(self, img_queue, relative_resdir, logger, dense = True, sequential = False, gpu=True, camera_model = 'SIMPLE_RADIAL'):
+    def __init__(self, img_queue, relative_resdir, logger, dense = True, sequential = False, gpu=True, camera_model = 'SIMPLE_RADIAL', quality = 'high'):
         mp.Process.__init__(self)
         self.img_queue = img_queue
         self.relative_resdir = relative_resdir
@@ -100,6 +102,7 @@ class Colmap(mp.Process):
         self.sequential = sequential
         self.gpu = gpu
         self.camera_model = camera_model
+        self.quality = quality
 
     def auto_reconstruct(self, imgdir, resdir):
         # Abort if resdir exists
@@ -139,12 +142,14 @@ class Colmap(mp.Process):
         --data_type {dtype} \
         --use_gpu {gpu} \
         --dense {dense} \
+        --quality {quality} \
         --camera_model {model}
         """.format(imgdir = imgdir,
                    resdir = resdir,
                    dtype = 'video' if self.sequential else 'individual',
                    gpu = self.gpu,
                    dense=self.dense,
+                   quality = self.quality,
                    model = self.camera_model)
         return self.run_cmd(col_cmd)
 
