@@ -86,6 +86,11 @@ else
   SUDO_OPT="sudo"
 fi
 
+#Pull image before running
+if [ ${PULL} == 1 ] ; then
+  ${SUDO_OPT} docker pull ${IMAGE}
+fi
+
 #Run!
 #Ports:
 #6006 -> Tensorflow
