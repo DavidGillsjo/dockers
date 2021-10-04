@@ -87,7 +87,7 @@ else
 fi
 
 #Pull image before running
-if [ ${PULL} == 1 ] ; then
+if [ "${PULL}" == 1 ] ; then
   ${SUDO_OPT} docker pull ${IMAGE}
 fi
 

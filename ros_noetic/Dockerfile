@@ -2,6 +2,7 @@ FROM osrf/ros:noetic-desktop-full
 
 RUN apt-get update && apt-get install -y \
   python3-pip \
+  wget \
   unzip && \
   apt-get clean && \
   apt-get autoremove && \
@@ -28,3 +29,9 @@ VOLUME /data
 VOLUME /host_home
 
 USER "${user}"
+
+# Default powerline10k theme, no plugins installed
+RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)"
+
+WORKDIR /host_home
+CMD zsh
