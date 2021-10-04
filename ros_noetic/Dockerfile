@@ -2,7 +2,7 @@ FROM osrf/ros:noetic-desktop-full
 
 RUN apt-get update && apt-get install -y \
   python3-pip \
-  unzip \
+  unzip && \
   apt-get clean && \
   apt-get autoremove && \
   rm -rf /var/lib/apt/lists/*
