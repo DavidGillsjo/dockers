@@ -99,6 +99,7 @@ ${SUDO_OPT} docker run --rm -it \
         ${NAME_OPT}\
         -v "${DATA-/tmp/data}:/data:rw"\
         -v "/etc/localtime:/etc/localtime:ro"\
+        -v "/etc/passwd:/etc/passwd:ro"\
         -p "8001-9000:8888"\
         ${USER_OPT}\
         ${SSH_OPT}\
