@@ -47,11 +47,11 @@ else
 fi
 
 #Mount git preferences if running as user
-if [[ $(id -g $USER) != 0 ]] && [[ -e "${HOME}/.gitconfig" ]] ; then
-  GIT_OPT="-v ${HOME}/.gitconfig:/home/$USER/.gitconfig:ro"
-else
-  GIT_OPT=""
-fi
+# if [[ $(id -g $USER) != 0 ]] && [[ -e "${HOME}/.gitconfig" ]] ; then
+#   GIT_OPT="-v ${HOME}/.gitconfig:/home/$USER/.gitconfig:ro"
+# else
+#   GIT_OPT=""
+# fi
 
 #Mount ssh keys if running as user
 if [[ $(id -g $USER) != 0 ]] && [[ -e "${HOME}/.ssh" ]] ; then
@@ -91,6 +91,14 @@ if [ "${PULL}" == 1 ] ; then
   ${SUDO_OPT} docker pull ${IMAGE}
 fi
 
+#Pull image before running
+if [ "${USE_IMAGE_USERS}" == 1 ] ; then
+    PASSWD_OPT=""
+    USER_OPT=""
+  else
+    PASSWD_OPT="-v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro"
+fi
+
 #Run!
 #Ports:
 #6006 -> Tensorflow
@@ -99,8 +107,7 @@ ${SUDO_OPT} docker run --rm -it \
         ${NAME_OPT}\
         -v "${DATA-/tmp/data}:/data:rw"\
         -v "/etc/localtime:/etc/localtime:ro"\
-        -v "/etc/passwd:/etc/passwd:ro"\
-        -v "/etc/group:/etc/group:ro"\
+        ${PASSWD_OPT}\
         -p "8001-9000:8888"\
         ${USER_OPT}\
         ${SSH_OPT}\
